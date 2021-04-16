@@ -1,0 +1,15 @@
+# This is a build stage 
+# we just build file in this FROM and copy the same to next from
+# This stage image, container and files will be ignored.
+
+FROM maven:3.6.0-jdk-11-slim AS stage1
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean package
+
+# Final Stage
+# The jar/build file is coppied from the previous stage FROM 
+
+FROM openjdk:11-jre-slim
+COPY --from=stage1 /usr/src/app/target/jb-hello-world-maven-0.1.0.jar /usr/local/lib/demo.jar
+CMD ["java","-jar","/usr/local/lib/demo.jar"]
